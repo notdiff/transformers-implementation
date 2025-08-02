@@ -97,7 +97,7 @@ class GPT(nn.Module):
 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
-    def forward(self, idx: torch.Tensor):
+    def forward(self, idx: torch.Tensor, targets: torch.Tensor = None):
         B, T = idx.size()
         assert T <= self.config.block_size, f"Sequence of length {T}, model block size is {self.config.block_size}"
 
@@ -112,7 +112,11 @@ class GPT(nn.Module):
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)
 
-        return logits
+        loss = None
+        if targets:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        return logits, loss
 
     @classmethod
     def from_pretrained(cls, model_type: str):
