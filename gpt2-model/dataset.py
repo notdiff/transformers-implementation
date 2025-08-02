@@ -2,11 +2,11 @@ import tiktoken
 import torch
 
 class DataLoaderLite:
-    def __init__(self, B: int, T: int):
+    def __init__(self, B: int, T: int, file_path: str):
         self.B = B
         self.T = T
 
-        with open("input.txt") as f:
+        with open(file_path) as f:
             text = f.read()
 
         enc = tiktoken.get_encoding("gpt2")
